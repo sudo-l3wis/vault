@@ -15,8 +15,7 @@ chmod +X /usr/local/bin/vault
 
 #### Store passwords
 Store an existing password or create a new one. You may add meta data to the
-password e.g. `email=foo@bar.com "dob=July 1 1990"` Note that meta data is not
-encrypted.
+password e.g. `email=foo@bar.com "dob=July 1 1990"`.
 ```
 vault put <name> "<password>" --foo=bar --fizz=buzz
 vault new <name> --foo=bar --fizz=buzz
