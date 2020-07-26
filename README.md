@@ -3,7 +3,8 @@
 A Linux based password manager.
 
 ## Install:
-cd to the repository directory.
+cd to the repository directory. Vault requires permissions to access data
+in /var/lib.
 ```
 go build
 cp Vault /usr/local/bin/vault
@@ -24,12 +25,18 @@ vault new <name> --foo=bar --fizz=buzz
 #### Show passwords
 ```
 vault show <name>
+vault show <name> -r
 vault ls
 ```
 
 #### Delete passwords
 ```
 vault drop <name>
+```
+
+#### List passwords
+```
+vault ls
 ```
 
 #### Encryption Keys:
