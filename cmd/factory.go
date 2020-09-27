@@ -23,6 +23,8 @@ func MakeCommand() Command {
 		return LsCommand{}
 	case "key":
 		return KeyCommand{}
+	case "push":
+		return PushCommand{}
 	default:
 		return UsageCommand{}
 	}
