@@ -1,5 +1,5 @@
 package commands
 
 type Command interface {
-	Action(ctx *Context)
+	Action(r Reader, w Writer)
 }

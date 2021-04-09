@@ -57,7 +57,7 @@ func loadSettings() Config {
 	return config
 }
 
-func (pc PushCommand) Action(ctx *Context) {
+func (pc PushCommand) Action(r Reader, w Writer) {
 	settings := loadSettings()
 
 	config := &ssh.ClientConfig {
@@ -87,5 +87,5 @@ func (pc PushCommand) Action(ctx *Context) {
 		panic("Failed to push password backup: " + err.Error())
 	}
 
-	ctx.Writer.Write("Pushed password backup: " + path)
+	w.Write("Pushed password backup: " + path)
 }

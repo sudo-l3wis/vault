@@ -1,13 +1,17 @@
 package commands
 
+import (
+	"github.com/sudo-l3wis/vault/data"
+)
+
 type DropCommand struct {}
 
-func (dc DropCommand) Action(ctx *Context) {
-	name, ok := ctx.Reader.Value(0)
+func (dc DropCommand) Action(r Reader, w Writer) {
+	name, ok := r.Value(0)
 	if !ok {
-		ctx.Writer.Write("Incorrect number of arguments.")
-		ctx.Writer.Write("Usage: vault drop <name>")
+		w.Write("Incorrect number of arguments.")
+		W.Write("Usage: vault drop <name>")
 		return
 	}
-	ctx.Store.Drop(name)
+	data.Storage.Drop(name)
 }

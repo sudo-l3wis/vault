@@ -4,29 +4,32 @@ import (
 	"fmt"
 	"math/rand"
 	"time"
+
+	"github.com/sudo-l3wis/vault/crypt"
+	"github.com/sudo-l3wis/vault/data"
 )
 
 const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@£$%^&*()-_=+[]{};:,<.>?"
 
 type NewCommand struct{}
 
-func (nc NewCommand) Action(ctx *Context) {
-	name, ok := ctx.Reader.Value(0)
-	meta := ctx.Reader.Arguments()
+func (nc NewCommand) Action(r Reader, w Writer) {
+	name, ok := r.Value(0)
+	meta := r.Arguments()
 	if !ok {
-		ctx.Writer.Write("Incorrect number of arguments")
-		ctx.Writer.Write("Usage: vault new <name> --meta=value")
+		w.Write("Incorrect number of arguments")
+		w.Write("Usage: vault new <name> --meta=value")
 		return
 	}
 
 	password := newPassword(32)
-	cipher := ctx.Crypt.Encrypt([]byte(password))
+	cipher := crypt.Keys.Encrypt([]byte(password))
 
 	for name, value := range meta {
-		meta[name] = ctx.Crypt.Encrypt([]byte(value))
+		meta[name] = crypt.Keys.Encrypt([]byte(value))
 	}
 
-	ctx.Store.Put(name, cipher, meta)
+	data.Storage.Put(name, cipher, meta)
 
 	fmt.Printf("Set password for %s\n", name)
 	fmt.Println(password)

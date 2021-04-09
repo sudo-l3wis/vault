@@ -3,9 +3,9 @@ package vault
 import "github.com/sudo-l3wis/vault/commands"
 
 func main() {
-	ctx := commands.MakeContext()
-	command := commands.MakeCommand()
+	r := ArgumentReader{},
+	w := ConsoleWriter{},
 
-	app := commands.App{}
-	app.Run(ctx, command)
+	cmd := commands.MakeCommand()
+	cmd.Action(r, w)	
 }

@@ -12,7 +12,11 @@ import (
 )
 
 const (
+	// bits defines the length of the encryption key.
 	bits = 4096
+
+	// path is the absolute path to the encryption keys
+	// used to encrypt passwords.
 	path = "/var/lib/vault/keys"
 )
 
@@ -21,13 +25,16 @@ type Crypt struct {
 	private *rsa.PrivateKey
 }
 
-func (c *Crypt) Innit() {
+var Keys = &Crypt{}
+
+func init() {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		c.GenKeys()
-		c.WriteKeys()
+		fmt.Println("Keys not found. Generating.")
+		Keys.GenKeys()
+		Keys.WriteKeys()
 	}
-	c.ReadPrivateKey()
-	c.ReadPublicKey()
+	Keys.ReadPrivateKey()
+	Keys.ReadPublicKey()
 }
 
 func (c *Crypt) PublicKeyToPem() string {

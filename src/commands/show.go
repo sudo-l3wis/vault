@@ -1,36 +1,40 @@
 package commands
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/sudo-l3wis/vault/crypt"
+)
 
 type ShowCommand struct {}
 
-func (sc ShowCommand) Action(ctx *Context) {
-	name, ok := ctx.Reader.Value(0)
+func (sc ShowCommand) Action(r Reader, w Writer) {
+	name, ok := r.Value(0)
 	if !ok {
-		ctx.Writer.Write("Invalid number of arguments.")
-		ctx.Writer.Write("usage: vault show <name>")
+		w.Write("Invalid number of arguments.")
+		w.Write("usage: vault show <name>")
 		return
 	}
 
-	password, meta := ctx.Store.Show(name)
+	password, meta := data.Storage.Show(name)
 	if password.ID == 0 {
-		ctx.Writer.Write(fmt.Sprintf("No password with name %s", name))
+		w.Write(fmt.Sprintf("No password with name %s", name))
 		return
 	}
 
-	if ctx.Reader.Option("r") {
-		ctx.Writer.Write(password.Body)
+	if r.Option("r") {
+		w.Write(password.Body)
 		return
 	}
 
-	body := ctx.Crypt.PemToMsg(password.Body)
-	decrypted := ctx.Crypt.Decrypt(body)
+	body := crypt.Keys.PemToMsg(password.Body)
+	decrypted := crypt.Keys.Decrypt(body)
 
-	ctx.Writer.Write(fmt.Sprintf("password: %s", decrypted))
+	w.Write(fmt.Sprintf("password: %s", decrypted))
 
 	for _, m := range meta {
-		b := ctx.Crypt.PemToMsg(m.Value)
-		d := ctx.Crypt.Decrypt(b)
-		ctx.Writer.Write(fmt.Sprintf("%s: %s", m.Name, d))
+		b := crypt.Keys.PemToMsg(m.Value)
+		d := crypt.Keys.Decrypt(b)
+		w.Write(fmt.Sprintf("%s: %s", m.Name, d))
 	}
 }

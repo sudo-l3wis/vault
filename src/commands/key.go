@@ -1,22 +1,26 @@
 package commands
 
+import (
+	"github.com/sudo-l3wis/vault/crypt"
+)
+
 type KeyCommand struct {}
 
-func (kc KeyCommand) Action(ctx *Context) {
-	name, ok := ctx.Reader.Value(0)
+func (kc KeyCommand) Action(r Reader, w Writer) {
+	name, ok := r.Value(0)
 	if !ok {
-		ctx.Writer.Write("Incorrect number of arguments.")
-		ctx.Writer.Write("Usage: vault key <public|private>")
+		w.Write("Incorrect number of arguments.")
+		w.Write("Usage: vault key <public|private>")
 		return
 	}
 
-	private, public := ctx.Crypt.GetKeys()
+	private, public := crypt.Keys.GetKeys()
 
 	if name == "public" {
-		ctx.Writer.Write(public)
+		w.Write(public)
 	} else if name == "private" {
-		ctx.Writer.Write(private)
+		w.Write(private)
 	} else {
-		ctx.Writer.Write("Invalid option")
+		w.Write("Invalid option")
 	}
 }

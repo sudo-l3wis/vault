@@ -26,6 +26,6 @@ func MakeCommand() Command {
 	case "push":
 		return PushCommand{}
 	default:
-		return WindowCommand{}
+		return UsageCommand{}
 	}
 }

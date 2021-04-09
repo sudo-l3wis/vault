@@ -9,12 +9,16 @@ import (
 )
 
 const (
+	// path is the absolute path tp the password
+	// database.
 	path = "/var/lib/vault/vault.db"
 )
 
 type Store struct {
 	db *gorm.DB
 }
+
+var Storage = &Store{}
 
 type Password struct {
 	gorm.Model
@@ -30,28 +34,28 @@ type Meta struct {
 	Value      string
 }
 
-func (s *Store) Load() {
+func init() {
 	var migrate bool
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		migrate = true
 	}
 
 	var err error
-	s.db, err = gorm.Open("sqlite3", path)
+	Storage.db, err = gorm.Open("sqlite3", path)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	if migrate {
-		s.db.AutoMigrate(&Password{}, &Meta{})
+		Storage.db.AutoMigrate(&Password{}, &Meta{})
 	}
 }
 
 func (s *Store) Put(name string, password string, meta map[string]string) {
 	p := Password{Name: name}
-	s.db.Where("name = ?", name).First(&p)
+	Storage.db.Where("name = ?", name).First(&p)
 	p.Body = password
-	s.db.Save(&p)
+	Storage.db.Save(&p)
 
 	for name, value := range meta {
 		model := Meta{
@@ -59,26 +63,26 @@ func (s *Store) Put(name string, password string, meta map[string]string) {
 			Name:       name,
 			Value:      value,
 		}
-		s.db.Create(&model)
+		Storage.db.Create(&model)
 	}
 }
 
 func (s *Store) Show(name string) (*Password, []*Meta) {
 	p := Password{}
-	s.db.Where("name = ?", name).Find(&p)
+	Storage.db.Where("name = ?", name).Find(&p)
 	var m []*Meta
-	s.db.Model(&p).Related(&m)
+	Storage.db.Model(&p).Related(&m)
 	return &p, m
 }
 
 func (s *Store) Drop(name string) {
 	p := Password{Name: name}
-	s.db.Where("name = ?", name).Find(&p)
-	s.db.Delete(&p)
+	Storage.db.Where("name = ?", name).Find(&p)
+	Storage.db.Delete(&p)
 }
 
 func (s *Store) List() []Password {
 	var passwords []Password
-	s.db.Find(&passwords)
+	Storage.db.Find(&passwords)
 	return passwords
 }
