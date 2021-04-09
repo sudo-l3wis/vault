@@ -1,4 +1,4 @@
-package cmd
+package commands
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 
 const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@£$%^&*()-_=+[]{};:,<.>?"
 
-type NewCommand struct {}
+type NewCommand struct{}
 
 func (nc NewCommand) Action(ctx *Context) {
 	name, ok := ctx.Reader.Value(0)

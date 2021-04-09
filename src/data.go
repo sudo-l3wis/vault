@@ -1,10 +1,11 @@
 package data
 
 import (
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"log"
 	"os"
+
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
 const (
@@ -25,11 +26,11 @@ type Password struct {
 type Meta struct {
 	gorm.Model
 	PasswordID uint
-	Name string
-	Value string
+	Name       string
+	Value      string
 }
 
-func (s* Store) Load() {
+func (s *Store) Load() {
 	var migrate bool
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		migrate = true
@@ -42,12 +43,11 @@ func (s* Store) Load() {
 	}
 
 	if migrate {
-		s.db.AutoMigrate(&Password{})
-		s.db.AutoMigrate(&Meta{})
+		s.db.AutoMigrate(&Password{}, &Meta{})
 	}
 }
 
-func (s* Store) Put(name string, password string, meta map[string]string) {
+func (s *Store) Put(name string, password string, meta map[string]string) {
 	p := Password{Name: name}
 	s.db.Where("name = ?", name).First(&p)
 	p.Body = password
@@ -56,14 +56,14 @@ func (s* Store) Put(name string, password string, meta map[string]string) {
 	for name, value := range meta {
 		model := Meta{
 			PasswordID: p.ID,
-			Name: name,
-			Value: value,
+			Name:       name,
+			Value:      value,
 		}
 		s.db.Create(&model)
 	}
 }
 
-func (s* Store) Show(name string) (*Password, []*Meta) {
+func (s *Store) Show(name string) (*Password, []*Meta) {
 	p := Password{}
 	s.db.Where("name = ?", name).Find(&p)
 	var m []*Meta
@@ -71,13 +71,13 @@ func (s* Store) Show(name string) (*Password, []*Meta) {
 	return &p, m
 }
 
-func (s* Store) Drop(name string) {
+func (s *Store) Drop(name string) {
 	p := Password{Name: name}
 	s.db.Where("name = ?", name).Find(&p)
 	s.db.Delete(&p)
 }
 
-func (s* Store) List() []Password {
+func (s *Store) List() []Password {
 	var passwords []Password
 	s.db.Find(&passwords)
 	return passwords

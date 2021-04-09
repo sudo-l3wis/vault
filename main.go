@@ -1,11 +1,11 @@
-package main
+package vault
 
-import "./cmd"
+import "github.com/sudo-l3wis/vault/commands"
 
 func main() {
-	ctx := cmd.MakeContext()
-	command := cmd.MakeCommand()
+	ctx := commands.MakeContext()
+	command := commands.MakeCommand()
 
-	app := cmd.App{}
+	app := commands.App{}
 	app.Run(ctx, command)
 }

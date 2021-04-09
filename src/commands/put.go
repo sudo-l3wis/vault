@@ -1,8 +1,8 @@
-package cmd
+package commands
 
 import "fmt"
 
-type PutCommand struct {}
+type PutCommand struct{}
 
 func (sc PutCommand) Action(ctx *Context) {
 	name, nok := ctx.Reader.Value(0)

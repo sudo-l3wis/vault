@@ -1,4 +1,4 @@
-package cmd
+package commands
 
 import "os"
 
@@ -26,6 +26,6 @@ func MakeCommand() Command {
 	case "push":
 		return PushCommand{}
 	default:
-		return UsageCommand{}
+		return WindowCommand{}
 	}
 }

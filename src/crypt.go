@@ -17,11 +17,11 @@ const (
 )
 
 type Crypt struct {
-	public *rsa.PublicKey
+	public  *rsa.PublicKey
 	private *rsa.PrivateKey
 }
 
-func (c* Crypt) Innit() {
+func (c *Crypt) Innit() {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		c.GenKeys()
 		c.WriteKeys()
@@ -30,55 +30,55 @@ func (c* Crypt) Innit() {
 	c.ReadPublicKey()
 }
 
-func (c* Crypt) PublicKeyToPem() string {
+func (c *Crypt) PublicKeyToPem() string {
 	return string(pem.EncodeToMemory(&pem.Block{
-		Type: "RSA PUBLIC KEY",
+		Type:  "RSA PUBLIC KEY",
 		Bytes: x509.MarshalPKCS1PublicKey(c.public),
 	}))
 }
 
-func (c* Crypt) PrivateKeyToPem() string {
+func (c *Crypt) PrivateKeyToPem() string {
 	return string(pem.EncodeToMemory(&pem.Block{
-		Type: "RSA PRIVATE KEY",
+		Type:  "RSA PRIVATE KEY",
 		Bytes: x509.MarshalPKCS1PrivateKey(c.private),
 	}))
 }
 
-func (c* Crypt) MsgToPem(msg []byte) string {
+func (c *Crypt) MsgToPem(msg []byte) string {
 	return string(pem.EncodeToMemory(&pem.Block{
-		Type: "PASSWORD",
+		Type:  "PASSWORD",
 		Bytes: msg,
 	}))
 }
 
-func (c* Crypt) PemToMsg(msg string) []byte {
+func (c *Crypt) PemToMsg(msg string) []byte {
 	p, _ := pem.Decode([]byte(msg))
 	return p.Bytes
 }
 
-func (c* Crypt) GenKeys() {
+func (c *Crypt) GenKeys() {
 	key, _ := rsa.GenerateKey(rand.Reader, bits)
 	c.private = key
 	c.public = &key.PublicKey
 }
 
-func (c* Crypt) WritePrivateKey() {
+func (c *Crypt) WritePrivateKey() {
 	private := c.PrivateKeyToPem()
-	err := ioutil.WriteFile(path + "/private.pem", []byte(private), 0644)
+	err := ioutil.WriteFile(path+"/private.pem", []byte(private), 0644)
 	if err != nil {
 		panic(err)
 	}
 }
 
-func (c* Crypt) WritePublicKey() {
+func (c *Crypt) WritePublicKey() {
 	public := c.PublicKeyToPem()
-	err := ioutil.WriteFile(path + "/public.pem", []byte(public), 0644)
+	err := ioutil.WriteFile(path+"/public.pem", []byte(public), 0644)
 	if err != nil {
 		panic(err)
 	}
 }
 
-func (c* Crypt) ReadPrivateKey() {
+func (c *Crypt) ReadPrivateKey() {
 	file, err := ioutil.ReadFile(path + "/private.pem")
 	if err != nil {
 		log.Fatal(err)
@@ -97,7 +97,7 @@ func (c* Crypt) ReadPrivateKey() {
 	c.private = privateKey
 }
 
-func (c* Crypt) ReadPublicKey() {
+func (c *Crypt) ReadPublicKey() {
 	file, err := ioutil.ReadFile(path + "/public.pem")
 	if err != nil {
 		log.Fatal(err)
@@ -116,7 +116,7 @@ func (c* Crypt) ReadPublicKey() {
 	c.public = pubKey
 }
 
-func (c* Crypt) WriteKeys() {
+func (c *Crypt) WriteKeys() {
 	err := os.MkdirAll(path, os.ModePerm)
 	if err != nil {
 		log.Fatal(err)
@@ -125,16 +125,16 @@ func (c* Crypt) WriteKeys() {
 	c.WritePrivateKey()
 }
 
-func (c* Crypt) Encrypt(msg []byte) string {
+func (c *Crypt) Encrypt(msg []byte) string {
 	text, _ := rsa.EncryptOAEP(sha256.New(), rand.Reader, c.public, msg, []byte(""))
 	return c.MsgToPem(text)
 }
 
-func (c* Crypt) Decrypt(msg []byte) []byte {
-	text, _:= rsa.DecryptOAEP(sha256.New(), rand.Reader, c.private, msg, []byte(""))
+func (c *Crypt) Decrypt(msg []byte) []byte {
+	text, _ := rsa.DecryptOAEP(sha256.New(), rand.Reader, c.private, msg, []byte(""))
 	return text
 }
 
-func (c* Crypt) GetKeys() (string, string) {
+func (c *Crypt) GetKeys() (string, string) {
 	return c.PrivateKeyToPem(), c.PublicKeyToPem()
 }

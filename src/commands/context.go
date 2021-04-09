@@ -1,8 +1,8 @@
-package cmd
+package commands
 
 import (
-	"../crypt"
-	"../data"
+	"github.com/sudo-l3wis/vault/crypt"
+	"github.com/sudo-l3wis/vault/data"
 )
 
 type Context struct {
