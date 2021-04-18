@@ -5,15 +5,16 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/sudo-l3wis/vault/crypt"
-	"github.com/sudo-l3wis/vault/data"
+	"github.com/sudo-l3wis/vault/types"
 )
 
-const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@£$%^&*()-_=+[]{};:,<.>?"
+const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@£$^&*()-_=+[]{};:,<.>?"
 
-type NewCommand struct{}
+type NewCommand struct {
+	command
+}
 
-func (nc NewCommand) Action(r Reader, w Writer) {
+func (c NewCommand) Action(r types.Reader, w types.Writer) {
 	name, ok := r.Value(0)
 	meta := r.Arguments()
 	if !ok {
@@ -23,16 +24,16 @@ func (nc NewCommand) Action(r Reader, w Writer) {
 	}
 
 	password := newPassword(32)
-	cipher := crypt.Keys.Encrypt([]byte(password))
+	cipher := c.cipher.Encrypt([]byte(password))
 
 	for name, value := range meta {
-		meta[name] = crypt.Keys.Encrypt([]byte(value))
+		meta[name] = c.cipher.Encrypt([]byte(value))
 	}
 
-	data.Storage.Put(name, cipher, meta)
+	c.storage.Put(name, cipher, meta)
 
-	fmt.Printf("Set password for %s\n", name)
-	fmt.Println(password)
+	w.Write(fmt.Sprintf("Set password for %s\n", name))
+	w.Write(password)
 }
 
 func newPassword(n int) string {

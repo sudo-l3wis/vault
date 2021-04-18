@@ -1,34 +1,11 @@
-package commands
+package io
 
 import (
 	"os"
 	"strings"
 )
 
-type Reader interface {
-	// Find an option within the input that corresponds with the given name.
-	// If an option is not found false is returned. Options are values that
-	// don't have an explicit value, they are a state that is either true or
-	// false.
-	Option(name string) bool
-
-	// Find an argument within the input that corresponds with the given name.
-	// If an argument is not found false will be returned. Arguments are named
-	// values.
-	Argument(name string) (string, bool)
-
-	// Fetch all arguments.
-	Arguments() map[string]string
-
-	// Find a value at the given position. If a value does not exist at the
-	// given position then false is returned.
-	Value(index int) (string, bool)
-
-	// Fetch all values.
-	Values() []string
-}
-
-type ArgumentReader struct {}
+type ArgumentReader struct{}
 
 func (r ArgumentReader) Option(name string) bool {
 	for _, arg := range os.Args[1:] {

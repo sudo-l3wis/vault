@@ -4,18 +4,23 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
-	"github.com/tmc/scp"
-	"golang.org/x/crypto/ssh"
 	"io/ioutil"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/tmc/scp"
+	"golang.org/x/crypto/ssh"
+
+	"github.com/sudo-l3wis/vault/types"
 )
 
-type PushCommand struct {}
+type PushCommand struct {
+	command
+}
 
 type Config struct {
-	Ip string `json:"ip"`
+	Ip  string `json:"ip"`
 	Key string `json:"key"`
 }
 
@@ -57,10 +62,10 @@ func loadSettings() Config {
 	return config
 }
 
-func (pc PushCommand) Action(r Reader, w Writer) {
+func (c PushCommand) Action(r types.Reader, w types.Writer) {
 	settings := loadSettings()
 
-	config := &ssh.ClientConfig {
+	config := &ssh.ClientConfig{
 		User: "root",
 		Auth: []ssh.AuthMethod{
 			publicKey(settings.Key),

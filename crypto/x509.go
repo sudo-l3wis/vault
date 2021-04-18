@@ -1,4 +1,4 @@
-package crypt
+package crypto
 
 import (
 	"crypto/rand"
@@ -6,6 +6,7 @@ import (
 	"crypto/sha256"
 	"crypto/x509"
 	"encoding/pem"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
