@@ -4,12 +4,14 @@ import (
 	"fmt"
 
 	"github.com/sudo-l3wis/vault/crypt"
-	"github.com/sudo-l3wis/vault/data"
+	"github.com/sudo-l3wis/vault/types"
 )
 
-type PutCommand struct{}
+type PutCommand struct {
+	command
+}
 
-func (sc PutCommand) Action(r Reader, w Writer) {
+func (c PutCommand) Action(r types.Reader, w types.Writer) {
 	name, nok := r.Value(0)
 	password, pok := r.Value(1)
 	meta := r.Arguments()
@@ -25,7 +27,7 @@ func (sc PutCommand) Action(r Reader, w Writer) {
 	}
 
 	pem := crypt.Keys.Encrypt([]byte(password))
-	data.Storage.Put(name, pem, meta)
+	c.storage.Put(name, pem, meta)
 
 	w.Write(fmt.Sprintf("Set password for %s", name))
 }

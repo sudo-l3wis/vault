@@ -1,15 +1,23 @@
 package commands
 
-import "os"
+import (
+	"github.com/sudo-l3wis/vault/types"
+)
 
-func MakeCommand() Command {
-	var name string
-	if len(os.Args) > 1 {
-		name = os.Args[1]
-	} else {
-		name = ""
-	}
+type command struct {
+	cipher  types.Cipher
+	storage types.Storage
+}
 
+func (c *command) SetCipher(cipher types.Cipher) {
+	c.cipher = cipher
+}
+
+func (c *command) SetStorage(storage types.Storage) {
+	c.storage = storage
+}
+
+func New(name string) types.Command {
 	switch name {
 	case "show":
 		return ShowCommand{}
