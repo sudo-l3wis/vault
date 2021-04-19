@@ -14,11 +14,9 @@ const (
 	path = "/var/lib/vault/vault.db"
 )
 
-type Store struct {
+type Sqlite struct {
 	db *gorm.DB
 }
-
-var Storage = &Store{}
 
 type Password struct {
 	gorm.Model
@@ -34,28 +32,28 @@ type Meta struct {
 	Value      string
 }
 
-func init() {
+func (s *Sqlite) Load() {
 	var migrate bool
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		migrate = true
 	}
 
 	var err error
-	Storage.db, err = gorm.Open("sqlite3", path)
+	s.db, err = gorm.Open("sqlite3", path)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	if migrate {
-		Storage.db.AutoMigrate(&Password{}, &Meta{})
+		s.db.AutoMigrate(&Password{}, &Meta{})
 	}
 }
 
-func (s *Store) Put(name string, password string, meta map[string]string) {
+func (s *Sqlite) Put(name string, password string, meta map[string]string) {
 	p := Password{Name: name}
-	Storage.db.Where("name = ?", name).First(&p)
+	s.db.Where("name = ?", name).First(&p)
 	p.Body = password
-	Storage.db.Save(&p)
+	s.db.Save(&p)
 
 	for name, value := range meta {
 		model := Meta{
@@ -63,26 +61,26 @@ func (s *Store) Put(name string, password string, meta map[string]string) {
 			Name:       name,
 			Value:      value,
 		}
-		Storage.db.Create(&model)
+		s.db.Create(&model)
 	}
 }
 
-func (s *Store) Show(name string) (*Password, []*Meta) {
+func (s *Sqlite) Show(name string) (*Password, []*Meta) {
 	p := Password{}
-	Storage.db.Where("name = ?", name).Find(&p)
+	s.db.Where("name = ?", name).Find(&p)
 	var m []*Meta
-	Storage.db.Model(&p).Related(&m)
+	s.db.Model(&p).Related(&m)
 	return &p, m
 }
 
-func (s *Store) Drop(name string) {
+func (s *Sqlite) Drop(name string) {
 	p := Password{Name: name}
-	Storage.db.Where("name = ?", name).Find(&p)
-	Storage.db.Delete(&p)
+	s.db.Where("name = ?", name).Find(&p)
+	s.db.Delete(&p)
 }
 
-func (s *Store) List() []Password {
+func (s *Sqlite) List() []Password {
 	var passwords []Password
-	Storage.db.Find(&passwords)
+	s.db.Find(&passwords)
 	return passwords
 }

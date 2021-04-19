@@ -28,8 +28,7 @@ type Reader interface {
 
 // Writer handles command output.
 type Writer interface {
-	// Write outputs given value to the defined output source.
-	Write(value string)
+	Write(value string) // Write outputs given value to the defined output source.
 }
 
 // Storage manages persisted password data.
@@ -46,24 +45,16 @@ type Storage interface {
 	List() []Password
 }
 
-// Cipher encrypts & decrypts messages.
+// Cipher encrypts & decrypts messages using public & private keys.
 type Cipher interface {
-	// Encrypt encrypts a message.
-	Encrypt(msg string) (string, error)
-	// Decrypt decrypts a message.
-	Decrypt(msg string) (string, error)
-	// WriteKeys persists the cryptographic keys.
-	WriteKeys(path string)
-	// GetKeys fetches the keys used to encrypt and decrypt messages.
-	GetKeys() (string, string)
+	Encrypt(msg string) string // Encrypt encrypts a message.
+	Decrypt(msg string) string // Decrypt decrypts a message.
+	WriteKeys(path string)     // WriteKeys persists the cryptographic keys.
 }
 
 // A Command segregates the domain logic.
 type Command interface {
-	// SetCipher sets the cipher adapter used to encrypt data.
-	SetCipher(c Cipher)
-	// SetStorage sets the storage adapter used to persist passwords.
-	SetStorage(s Storage)
-	// Action invokes the command action.
-	Action(r Reader, w Writer)
+	SetCipher(c Cipher)        // SetCipher sets the cipher adapter used to encrypt data.
+	SetStorage(s Storage)      // SetStorage sets the storage adapter used to persist passwords.
+	Action(r Reader, w Writer) // Action invokes the command action.
 }

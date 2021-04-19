@@ -1,6 +1,8 @@
 package commands
 
 import (
+	"github.com/sudo-l3wis/vault/ciphers"
+	"github.com/sudo-l3wis/vault/storage"
 	"github.com/sudo-l3wis/vault/types"
 )
 
@@ -18,22 +20,28 @@ func (c *command) SetStorage(storage types.Storage) {
 }
 
 func New(name string) types.Command {
+	var cmd types.Command
 	switch name {
 	case "show":
-		return ShowCommand{}
+		cmd = ShowCommand{}
 	case "put":
-		return PutCommand{}
+		cmd = PutCommand{}
 	case "new":
-		return NewCommand{}
+		cmd = NewCommand{}
 	case "drop":
-		return DropCommand{}
+		cmd = DropCommand{}
 	case "ls":
-		return LsCommand{}
+		cmd = LsCommand{}
 	case "key":
-		return KeyCommand{}
+		cmd = KeyCommand{}
 	case "push":
-		return PushCommand{}
+		cmd = PushCommand{}
 	default:
-		return UsageCommand{}
+		cmd = UsageCommand{}
 	}
+
+	cmd.SetCipher(ciphers.X509{})
+	cmd.SetStorage(storage.Sqlite{})
+
+	return cmd
 }

@@ -1,4 +1,4 @@
-package crypto
+package ciphers
 
 import (
 	"crypto/rand"
@@ -6,7 +6,6 @@ import (
 	"crypto/sha256"
 	"crypto/x509"
 	"encoding/pem"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -16,77 +15,88 @@ const (
 	// bits defines the length of the encryption key.
 	bits = 4096
 
-	// path is the absolute path to the encryption keys
-	// used to encrypt passwords.
+	// path is the absolute path to the encryption keys used
+	// to encrypt passwords.
 	path = "/var/lib/vault/keys"
 )
 
-type Crypt struct {
+type X509 struct {
 	public  *rsa.PublicKey
 	private *rsa.PrivateKey
 }
 
-var Keys = &Crypt{}
-
-func init() {
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		fmt.Println("Keys not found. Generating.")
-		Keys.GenKeys()
-		Keys.WriteKeys()
-	}
-	Keys.ReadPrivateKey()
-	Keys.ReadPublicKey()
+func (x *X509) Encrypt(msg string) string {
+	text, _ := rsa.EncryptOAEP(sha256.New(), rand.Reader, x.public, []byte(msg), []byte(""))
+	return x.MsgToPem(text)
 }
 
-func (c *Crypt) PublicKeyToPem() string {
+func (x *X509) Decrypt(msg string) string {
+	text, _ := rsa.DecryptOAEP(sha256.New(), rand.Reader, x.private, []byte(msg), []byte(""))
+	return string(text)
+}
+
+func (x *X509) WriteKeys(path string) {
+	err := os.MkdirAll(path, os.ModePerm)
+	if err != nil {
+		log.Fatal(err)
+	}
+	x.WritePublicKey()
+	x.WritePrivateKey()
+}
+
+func (x *X509) GetKeys() (string, string) {
+	return x.PrivateKeyToPem(), x.PublicKeyToPem()
+}
+
+func (x *X509) PublicKeyToPem() string {
 	return string(pem.EncodeToMemory(&pem.Block{
 		Type:  "RSA PUBLIC KEY",
-		Bytes: x509.MarshalPKCS1PublicKey(c.public),
+		Bytes: x509.MarshalPKCS1PublicKey(x.public),
 	}))
 }
 
-func (c *Crypt) PrivateKeyToPem() string {
+func (x *X509) PrivateKeyToPem() string {
 	return string(pem.EncodeToMemory(&pem.Block{
 		Type:  "RSA PRIVATE KEY",
-		Bytes: x509.MarshalPKCS1PrivateKey(c.private),
+		Bytes: x509.MarshalPKCS1PrivateKey(x.private),
 	}))
 }
 
-func (c *Crypt) MsgToPem(msg []byte) string {
+func (x *X509) MsgToPem(msg []byte) string {
 	return string(pem.EncodeToMemory(&pem.Block{
 		Type:  "PASSWORD",
 		Bytes: msg,
 	}))
 }
 
-func (c *Crypt) PemToMsg(msg string) []byte {
+func (x *X509) PemToMsg(msg string) []byte {
 	p, _ := pem.Decode([]byte(msg))
 	return p.Bytes
 }
 
-func (c *Crypt) GenKeys() {
+func (x *X509) GenKeys() {
 	key, _ := rsa.GenerateKey(rand.Reader, bits)
-	c.private = key
-	c.public = &key.PublicKey
+	x.private = key
+	x.public = &key.PublicKey
 }
 
-func (c *Crypt) WritePrivateKey() {
-	private := c.PrivateKeyToPem()
+func (x *X509) WritePrivateKey() {
+	private := x.PrivateKeyToPem()
 	err := ioutil.WriteFile(path+"/private.pem", []byte(private), 0644)
 	if err != nil {
 		panic(err)
 	}
 }
 
-func (c *Crypt) WritePublicKey() {
-	public := c.PublicKeyToPem()
+func (x *X509) WritePublicKey() {
+	public := x.PublicKeyToPem()
 	err := ioutil.WriteFile(path+"/public.pem", []byte(public), 0644)
 	if err != nil {
 		panic(err)
 	}
 }
 
-func (c *Crypt) ReadPrivateKey() {
+func (x *X509) ReadPrivateKey() {
 	file, err := ioutil.ReadFile(path + "/private.pem")
 	if err != nil {
 		log.Fatal(err)
@@ -102,10 +112,10 @@ func (c *Crypt) ReadPrivateKey() {
 
 	var privateKey *rsa.PrivateKey
 	privateKey, _ = parsedKey.(*rsa.PrivateKey)
-	c.private = privateKey
+	x.private = privateKey
 }
 
-func (c *Crypt) ReadPublicKey() {
+func (x *X509) ReadPublicKey() {
 	file, err := ioutil.ReadFile(path + "/public.pem")
 	if err != nil {
 		log.Fatal(err)
@@ -121,28 +131,5 @@ func (c *Crypt) ReadPublicKey() {
 
 	var pubKey *rsa.PublicKey
 	pubKey, _ = parsedKey.(*rsa.PublicKey)
-	c.public = pubKey
-}
-
-func (c *Crypt) WriteKeys() {
-	err := os.MkdirAll(path, os.ModePerm)
-	if err != nil {
-		log.Fatal(err)
-	}
-	c.WritePublicKey()
-	c.WritePrivateKey()
-}
-
-func (c *Crypt) Encrypt(msg []byte) string {
-	text, _ := rsa.EncryptOAEP(sha256.New(), rand.Reader, c.public, msg, []byte(""))
-	return c.MsgToPem(text)
-}
-
-func (c *Crypt) Decrypt(msg []byte) []byte {
-	text, _ := rsa.DecryptOAEP(sha256.New(), rand.Reader, c.private, msg, []byte(""))
-	return text
-}
-
-func (c *Crypt) GetKeys() (string, string) {
-	return c.PrivateKeyToPem(), c.PublicKeyToPem()
+	x.public = pubKey
 }
