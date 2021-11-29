@@ -10,7 +10,7 @@ type ShowCommand struct {
 	command
 }
 
-func (c ShowCommand) Action(r types.Reader, w types.Writer) {
+func (c ShowCommand) Action(r Reader, w Writer) {
 	name, ok := r.Value(0)
 	if !ok {
 		w.Write("Invalid number of arguments.")

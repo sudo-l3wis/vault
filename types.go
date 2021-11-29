@@ -1,4 +1,4 @@
-package types
+package main
 
 // Password is the primary data model.
 type Password interface{}
@@ -6,7 +6,7 @@ type Password interface{}
 // Meta represents additional data for passwords.
 type Meta interface{}
 
-// Reader processes input that determines which utiltiy to invoke.
+// Reader processes input that determines which utility to invoke.
 type Reader interface {
 	// Option finds an option within the input that corresponds with the given name.
 	// If an option is not found false is returned. Options are values that
@@ -39,7 +39,7 @@ type Storage interface {
 	// Show finds a password record with the given name and provides the
 	// associated meta data.
 	Show(name string) (*Password, []*Meta)
-	// Drop delets a password record with the given name.
+	// Drop deletes a password record with the given name.
 	Drop(name string)
 	// List fetches all passwords.
 	List() []Password

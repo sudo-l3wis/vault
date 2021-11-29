@@ -1,6 +1,6 @@
 # Vault
 
-A password manager.
+A password manager (incomplete).
 
 
 #### CLI

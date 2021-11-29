@@ -6,6 +6,6 @@ type UsageCommand struct {
 	command
 }
 
-func (uc UsageCommand) Action(r types.Reader, w types.Writer) {
+func (uc UsageCommand) Action(r Reader, w Writer) {
 	w.Write("Command not found. Try `vlt help`.")
 }

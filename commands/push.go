@@ -62,7 +62,7 @@ func loadSettings() Config {
 	return config
 }
 
-func (c PushCommand) Action(r types.Reader, w types.Writer) {
+func (c PushCommand) Action(r Reader, w Writer) {
 	settings := loadSettings()
 
 	config := &ssh.ClientConfig{

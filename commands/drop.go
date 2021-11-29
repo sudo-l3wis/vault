@@ -8,7 +8,7 @@ type DropCommand struct {
 	command
 }
 
-func (c DropCommand) Action(r types.Reader, w types.Writer) {
+func (c DropCommand) Action(r Reader, w Writer) {
 	name, ok := r.Value(0)
 	if !ok {
 		w.Write("Incorrect number of arguments.")

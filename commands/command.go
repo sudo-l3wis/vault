@@ -3,24 +3,23 @@ package commands
 import (
 	"github.com/sudo-l3wis/vault/ciphers"
 	"github.com/sudo-l3wis/vault/storage"
-	"github.com/sudo-l3wis/vault/types"
 )
 
 type command struct {
-	cipher  types.Cipher
-	storage types.Storage
+	cipher  Cipher
+	storage Storage
 }
 
-func (c *command) SetCipher(cipher types.Cipher) {
+func (c *command) SetCipher(cipher Cipher) {
 	c.cipher = cipher
 }
 
-func (c *command) SetStorage(storage types.Storage) {
+func (c *command) SetStorage(storage Storage) {
 	c.storage = storage
 }
 
-func New(name string) types.Command {
-	var cmd types.Command
+func New(name string) Command {
+	var cmd Command
 	switch name {
 	case "show":
 		cmd = ShowCommand{}

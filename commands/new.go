@@ -14,7 +14,7 @@ type NewCommand struct {
 	command
 }
 
-func (c NewCommand) Action(r types.Reader, w types.Writer) {
+func (c NewCommand) Action(r Reader, w Writer) {
 	name, ok := r.Value(0)
 	meta := r.Arguments()
 	if !ok {

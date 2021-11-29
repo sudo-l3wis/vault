@@ -6,7 +6,7 @@ type KeyCommand struct {
 	command
 }
 
-func (c KeyCommand) Action(r types.Reader, w types.Writer) {
+func (c KeyCommand) Action(r Reader, w Writer) {
 	name, ok := r.Value(0)
 	if !ok {
 		w.Write("Incorrect number of arguments.")

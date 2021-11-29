@@ -11,7 +11,7 @@ type PutCommand struct {
 	command
 }
 
-func (c PutCommand) Action(r types.Reader, w types.Writer) {
+func (c PutCommand) Action(r Reader, w Writer) {
 	name, nok := r.Value(0)
 	password, pok := r.Value(1)
 	meta := r.Arguments()
